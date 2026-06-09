@@ -1,0 +1,26 @@
+.DS_Store
+
+# Dependencies
+node_modules
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Runtime and local generated state
+.easy_exam_runtime/
+.codex_tmp_spreadsheet/
+__pycache__/
+server/__pycache__/
+
+# Build and output artifacts
+outputs/*
+!outputs/web_prototype/
+outputs/web_prototype/*
+!outputs/web_prototype/easy_exam_automation.html
+
+# Logs
+*.log

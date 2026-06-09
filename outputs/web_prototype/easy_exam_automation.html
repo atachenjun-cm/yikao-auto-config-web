@@ -1,0 +1,2191 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>易考自动配置控制台</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --panel: #ffffff;
+        --panel-soft: #f9fafb;
+        --line: #d9dee7;
+        --line-strong: #bac4d2;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --soft: #eef2f6;
+        --blue: #1f75cb;
+        --blue-dark: #185b9e;
+        --teal: #16827a;
+        --green: #20865a;
+        --amber: #c77700;
+        --red: #b42318;
+        --shadow: 0 14px 36px rgba(31, 41, 55, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        letter-spacing: 0;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .app-shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 248px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        background: #ffffff;
+        border-right: 1px solid var(--line);
+        padding: 22px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 0;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: var(--blue);
+        color: white;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+      }
+
+      .brand-title {
+        font-weight: 750;
+        line-height: 1.2;
+      }
+
+      .brand-subtitle {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+
+      .nav {
+        display: grid;
+        gap: 6px;
+      }
+
+      .nav-item {
+        min-height: 38px;
+        padding: 9px 10px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        border-radius: 6px;
+        color: #394150;
+        font-size: 14px;
+      }
+
+      .nav-item.active {
+        background: #eaf3ff;
+        color: var(--blue-dark);
+        font-weight: 700;
+      }
+
+      .icon {
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        flex: 0 0 auto;
+      }
+
+      .side-status {
+        margin-top: auto;
+        padding: 13px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel-soft);
+      }
+
+      .status-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 13px;
+        margin: 8px 0;
+      }
+
+      .ok {
+        color: var(--green);
+        font-weight: 700;
+      }
+
+      .main {
+        padding: 22px 26px 32px;
+        min-width: 0;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin: 0 0 5px;
+        line-height: 1.25;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .btn {
+        border: 1px solid var(--line-strong);
+        background: #ffffff;
+        color: #223044;
+        min-height: 36px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: 650;
+        white-space: nowrap;
+      }
+
+      .btn:hover {
+        border-color: var(--blue);
+      }
+
+      .btn.primary {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: white;
+      }
+
+      .btn.primary:hover {
+        background: var(--blue-dark);
+      }
+
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: minmax(320px, 0.88fr) minmax(420px, 1.12fr);
+        gap: 16px;
+      }
+
+      .stack {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        min-width: 0;
+      }
+
+      .panel-head {
+        padding: 15px 16px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .panel-title {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.3;
+      }
+
+      .panel-meta {
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .panel-body {
+        padding: 16px;
+      }
+
+      .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .field-label {
+        color: #425066;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .field-input {
+        width: 100%;
+        min-height: 38px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
+        padding: 9px 11px;
+        background: #fff;
+        color: var(--text);
+      }
+
+      .field-input:focus {
+        outline: 0;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(31, 117, 203, 0.1);
+      }
+
+      .settings-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+
+      .settings-note {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .drop-zone {
+        border: 1px dashed var(--line-strong);
+        background: #fbfcfe;
+        min-height: 178px;
+        border-radius: 8px;
+        padding: 18px;
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        text-align: center;
+        gap: 12px;
+      }
+
+      .drop-zone.is-ready {
+        border-color: var(--teal);
+        background: #f0faf8;
+      }
+
+      .file-badge {
+        width: 58px;
+        height: 70px;
+        border: 1px solid #b8c4d0;
+        border-radius: 6px;
+        background: linear-gradient(180deg, #ffffff 0%, #eef3f8 100%);
+        display: grid;
+        place-items: center;
+        color: var(--green);
+        font-weight: 800;
+        font-size: 13px;
+        position: relative;
+      }
+
+      .file-badge::after {
+        content: "";
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        width: 16px;
+        height: 16px;
+        background: #dce5ef;
+        clip-path: polygon(0 0, 100% 0, 100% 100%);
+      }
+
+      .drop-title {
+        font-weight: 750;
+      }
+
+      .drop-note {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .hidden-input {
+        display: none;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .metric {
+        padding: 12px;
+        background: var(--panel-soft);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .metric-label {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .metric-value {
+        margin-top: 6px;
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .progress-wrap {
+        display: grid;
+        gap: 14px;
+      }
+
+      .progress-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 18px;
+      }
+
+      .progress-number {
+        font-size: 34px;
+        font-weight: 800;
+        color: var(--blue-dark);
+        line-height: 1;
+      }
+
+      .bar {
+        height: 12px;
+        border-radius: 999px;
+        background: #e4e8ee;
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--blue);
+        transition: width 260ms ease;
+      }
+
+      .step-list {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .step {
+        border: 1px solid var(--line);
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 10px;
+        min-height: 86px;
+      }
+
+      .step-index {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #e8edf3;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 9px;
+      }
+
+      .step.active {
+        border-color: var(--blue);
+        background: #f3f8ff;
+      }
+
+      .step.active .step-index {
+        background: var(--blue);
+        color: white;
+      }
+
+      .step.done .step-index {
+        background: var(--green);
+        color: white;
+      }
+
+      .step-title {
+        font-size: 13px;
+        font-weight: 750;
+        line-height: 1.25;
+      }
+
+      .step-state {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+
+      .lower-grid {
+        display: grid;
+        grid-template-columns: minmax(420px, 1.08fr) minmax(320px, 0.92fr);
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        padding: 10px 8px;
+        font-size: 13px;
+        vertical-align: top;
+      }
+
+      th {
+        color: #425066;
+        background: var(--panel-soft);
+        font-weight: 750;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #eaf3ff;
+        color: var(--blue-dark);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .tag.green {
+        background: #e8f6ef;
+        color: var(--green);
+      }
+
+      .tag.amber {
+        background: #fff4df;
+        color: #8a5700;
+      }
+
+      .log-list {
+        display: grid;
+        gap: 9px;
+        max-height: 326px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+
+      .log {
+        border-left: 3px solid var(--line-strong);
+        padding: 7px 10px;
+        background: var(--panel-soft);
+        border-radius: 0 6px 6px 0;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .log.success {
+        border-left-color: var(--green);
+      }
+
+      .log.warn {
+        border-left-color: var(--amber);
+      }
+
+      .log-time {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .review-strip {
+        margin-top: 14px;
+        border: 1px solid #ffd89a;
+        background: #fff8ec;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        color: #553600;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .mock-window {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        overflow: hidden;
+        margin-top: 14px;
+      }
+
+      .mock-window-bar {
+        height: 34px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 12px;
+        background: #edf1f5;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #aab4c0;
+      }
+
+      .mock-body {
+        padding: 13px;
+        display: grid;
+        grid-template-columns: 98px minmax(0, 1fr);
+        gap: 12px;
+        min-height: 150px;
+      }
+
+      .mock-menu {
+        display: grid;
+        align-content: start;
+        gap: 8px;
+      }
+
+      .mock-menu span,
+      .mock-row {
+        height: 12px;
+        border-radius: 999px;
+        background: #d9e2ec;
+      }
+
+      .mock-menu span:nth-child(2) {
+        background: #c7e1fb;
+      }
+
+      .mock-content {
+        display: grid;
+        gap: 10px;
+        align-content: start;
+      }
+
+      .mock-card {
+        border: 1px solid #d8e1eb;
+        border-radius: 7px;
+        padding: 10px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .mock-row.short {
+        width: 48%;
+      }
+
+      .mock-row.mid {
+        width: 72%;
+      }
+
+      .capture-panel {
+        margin-top: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        overflow: hidden;
+      }
+
+      .capture-head {
+        padding: 12px 13px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .capture-title {
+        font-size: 13px;
+        font-weight: 750;
+      }
+
+      .capture-grid {
+        padding: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .capture-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--panel-soft);
+        min-width: 0;
+        cursor: pointer;
+        text-align: left;
+        padding: 0;
+      }
+
+      .capture-card:hover {
+        border-color: var(--blue);
+      }
+
+      .capture-thumb {
+        height: 118px;
+        background: #edf2f7;
+        padding: 9px;
+        display: grid;
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: 8px;
+      }
+
+      .capture-nav {
+        display: grid;
+        align-content: start;
+        gap: 7px;
+      }
+
+      .capture-nav span,
+      .capture-line {
+        height: 8px;
+        border-radius: 999px;
+        background: #cdd8e5;
+      }
+
+      .capture-nav span:nth-child(3) {
+        background: #77b8ed;
+      }
+
+      .capture-sheet {
+        background: white;
+        border: 1px solid #d4dde8;
+        border-radius: 5px;
+        padding: 8px;
+        display: grid;
+        gap: 7px;
+        align-content: start;
+      }
+
+      .capture-line.short {
+        width: 46%;
+      }
+
+      .capture-line.mid {
+        width: 72%;
+      }
+
+      .capture-line.good {
+        background: #8bd0aa;
+      }
+
+      .capture-info {
+        padding: 9px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .capture-empty {
+        grid-column: 1 / -1;
+        min-height: 92px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        border: 1px dashed var(--line-strong);
+        border-radius: 8px;
+        background: var(--panel-soft);
+        font-size: 13px;
+      }
+
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.54);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 22px;
+        z-index: 30;
+      }
+
+      .modal-backdrop.open {
+        display: flex;
+      }
+
+      .modal {
+        width: min(1180px, 100%);
+        max-height: min(720px, 92vh);
+        background: #ffffff;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.26);
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+      }
+
+      .modal-head {
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .modal-title {
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .icon-btn {
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
+        background: #ffffff;
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+      }
+
+      .modal-body {
+        padding: 12px;
+        overflow: auto;
+        background: #dfe3e8;
+      }
+
+      .large-shot {
+        min-height: 430px;
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: 38px minmax(0, 1fr);
+      }
+
+      .large-browserbar {
+        background: #edf1f5;
+        border-bottom: 1px solid #cbd5e1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px;
+      }
+
+      .large-address {
+        flex: 1;
+        height: 20px;
+        border-radius: 999px;
+        background: #ffffff;
+        border: 1px solid #d5dde7;
+      }
+
+      .large-content {
+        display: grid;
+        grid-template-columns: 152px minmax(0, 1fr);
+        min-height: 390px;
+      }
+
+      .large-side {
+        border-right: 1px solid #d8e1eb;
+        background: #f8fafc;
+        padding: 18px 14px;
+        display: grid;
+        align-content: start;
+        gap: 12px;
+      }
+
+      .large-side span,
+      .large-line {
+        height: 12px;
+        border-radius: 999px;
+        background: #d7e0ea;
+      }
+
+      .large-side span:nth-child(4) {
+        background: #77b8ed;
+      }
+
+      .large-main {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+        align-content: start;
+      }
+
+      .large-section {
+        border: 1px solid #d8e1eb;
+        border-radius: 8px;
+        padding: 14px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .large-section-title {
+        font-weight: 800;
+        font-size: 13px;
+        color: #344054;
+      }
+
+      .large-row {
+        display: grid;
+        grid-template-columns: 132px minmax(0, 1fr) 78px;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .large-line.good {
+        background: #8bd0aa;
+      }
+
+      .large-line.blue {
+        background: #77b8ed;
+      }
+
+      .large-line.short {
+        width: 54%;
+      }
+
+      .eq-shot {
+        background: #ededed;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        overflow: hidden;
+        min-height: 720px;
+      }
+
+      .eq-topnav {
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 0 28px;
+        border-bottom: 1px solid #d9dee5;
+        background: #ffffff;
+      }
+
+      .eq-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        color: #3f454d;
+      }
+
+      .eq-logo-mark {
+        width: 28px;
+        height: 22px;
+        border-radius: 6px;
+        background: #1687e8;
+        color: #ffffff;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+      }
+
+      .eq-menu {
+        display: flex;
+        gap: 34px;
+        color: #2f3741;
+        font-size: 14px;
+      }
+
+      .eq-stepbar {
+        height: 84px;
+        background: #f1f2f4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 0 24px;
+        color: #a4aab3;
+      }
+
+      .eq-step {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 28px;
+        padding: 6px 18px 6px 13px;
+        border-radius: 4px 0 0 4px;
+        font-size: 13px;
+        position: relative;
+      }
+
+      .eq-step.active,
+      .eq-step.done {
+        background: #1e9bf0;
+        color: white;
+      }
+
+      .eq-step.active::after,
+      .eq-step.done::after {
+        content: "";
+        position: absolute;
+        right: -13px;
+        top: 0;
+        width: 0;
+        height: 0;
+        border-top: 14px solid transparent;
+        border-bottom: 14px solid transparent;
+        border-left: 13px solid #1e9bf0;
+        z-index: 1;
+      }
+
+      .eq-step-num {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: currentColor;
+        color: #1e9bf0;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .eq-step:not(.active):not(.done) .eq-step-num {
+        color: #ffffff;
+        background: #c7ccd3;
+      }
+
+      .eq-page {
+        width: min(1040px, calc(100% - 100px));
+        margin: 0 auto 38px;
+        background: #ffffff;
+        padding: 22px 32px 30px;
+        display: grid;
+        gap: 20px;
+        min-height: 548px;
+      }
+
+      .eq-field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .eq-label {
+        color: #8a9098;
+        font-size: 13px;
+      }
+
+      .eq-input,
+      .eq-textarea {
+        border: 1px solid #cfd5dd;
+        border-radius: 3px;
+        background: #ffffff;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        padding: 8px 10px;
+        color: #344054;
+        font-size: 13px;
+      }
+
+      .eq-textarea {
+        min-height: 132px;
+        align-items: flex-start;
+      }
+
+      .eq-field .eq-input {
+        width: 100%;
+      }
+
+      .eq-inline .eq-input {
+        width: 190px;
+      }
+
+      .eq-inline {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 16px;
+        color: #7b828c;
+        font-size: 13px;
+      }
+
+      .eq-radio,
+      .eq-check {
+        width: 15px;
+        height: 15px;
+        border: 1px solid #c5ccd5;
+        background: #ffffff;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 6px;
+      }
+
+      .eq-radio {
+        border-radius: 50%;
+      }
+
+      .eq-radio.on {
+        border: 4px solid #1e9bf0;
+      }
+
+      .eq-check.on {
+        background: #1e9bf0;
+        border-color: #1e9bf0;
+        position: relative;
+      }
+
+      .eq-check.on::after {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 1px;
+        width: 5px;
+        height: 9px;
+        border: solid #ffffff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+
+      .eq-config-section {
+        border: 1px solid #d9dde4;
+        padding: 12px 26px;
+        display: grid;
+        gap: 0;
+      }
+
+      .eq-section-title {
+        color: #7b828c;
+        font-size: 14px;
+        margin: 4px 0 -4px;
+      }
+
+      .eq-option {
+        display: grid;
+        grid-template-columns: 150px minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+        padding: 13px 0;
+        color: #344054;
+        font-size: 13px;
+        border-bottom: 1px solid #d9dde4;
+      }
+
+      .eq-option:last-child {
+        border-bottom: 0;
+      }
+
+      .eq-option-desc {
+        color: #6b7280;
+        line-height: 1.55;
+      }
+
+      .eq-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #1687e8;
+        font-weight: 700;
+      }
+
+      .eq-small-input {
+        width: 72px;
+        min-height: 28px;
+        border: 1px solid #cfd5dd;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #344054;
+        background: #f8fafc;
+      }
+
+      .eq-actions {
+        width: min(1040px, calc(100% - 100px));
+        margin: -6px auto 0;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .eq-next {
+        min-width: 88px;
+        height: 30px;
+        border: 0;
+        border-radius: 3px;
+        background: #1687e8;
+        color: #ffffff;
+        font-size: 13px;
+      }
+
+      .eq-select {
+        width: 104px;
+        min-height: 30px;
+        border: 1px solid #cfd5dd;
+        border-radius: 3px;
+        padding: 6px 10px;
+        color: #4b5563;
+        background: #ffffff;
+        font-size: 13px;
+      }
+
+      @media (max-width: 1120px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          display: none;
+        }
+
+        .dashboard,
+        .lower-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .main {
+          padding: 16px;
+        }
+
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .toolbar {
+          width: 100%;
+          justify-content: stretch;
+        }
+
+        .btn {
+          flex: 1 1 auto;
+          justify-content: center;
+        }
+
+        .summary-grid,
+        .step-list,
+        .capture-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .progress-top {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        th,
+        td {
+          font-size: 12px;
+        }
+
+        .large-content {
+          grid-template-columns: 1fr;
+        }
+
+        .large-side {
+          display: none;
+        }
+
+        .large-row {
+          grid-template-columns: 1fr;
+        }
+
+        .eq-menu {
+          display: none;
+        }
+
+        .eq-option {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">易</div>
+          <div>
+            <div class="brand-title">考试配置台</div>
+            <div class="brand-subtitle">需求单驱动自动化</div>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="主导航">
+          <div class="nav-item active">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5h16M4 12h16M4 19h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            自动配置
+          </div>
+          <div class="nav-item">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 3h7l5 5v13H7z" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M14 3v6h5" fill="none" stroke="currentColor" stroke-width="2" />
+            </svg>
+            需求单记录
+          </div>
+          <div class="nav-item">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v18M4 9h16M6 15h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            配置模板
+          </div>
+          <div class="nav-item">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 19V5h14v14zM8 9h8M8 13h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            执行日志
+          </div>
+        </nav>
+
+        <div class="side-status">
+          <div class="status-line"><span>易考后台</span><span>待配置</span></div>
+          <div class="status-line"><span>脚本引擎</span><span class="ok">可用</span></div>
+          <div class="status-line"><span>最终创建</span><span>人工确认</span></div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div>
+            <h1>易考考试自动配置</h1>
+            <p class="subtitle">导入 Excel 需求单后，自动完成后台配置，并在确认页停下等待人工核对。</p>
+          </div>
+          <div class="toolbar">
+            <button class="btn" id="resetBtn" type="button" title="清空当前导入和执行记录">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 4v6h6M20 20v-6h-6M20 9A8 8 0 0 0 6.7 5.4L4 8M4 15a8 8 0 0 0 13.3 3.6L20 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              重置
+            </button>
+            <button class="btn" id="demoBtn" type="button" title="使用当前测试需求单模拟导入">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              模拟导入
+            </button>
+            <button class="btn primary" id="runBtn" type="button" disabled title="开始自动配置">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 3l14 9-14 9z" fill="currentColor" />
+              </svg>
+              开始配置
+            </button>
+          </div>
+        </div>
+
+        <section class="stack">
+          <div class="panel">
+            <div class="panel-head">
+              <h2 class="panel-title">后台连接</h2>
+              <span class="panel-meta" id="loginState">未配置</span>
+            </div>
+            <div class="panel-body">
+              <div class="settings-grid">
+                <label class="field">
+                  <span class="field-label">登录网址</span>
+                  <input class="field-input" id="loginUrlInput" type="url" placeholder="https://eztest.org/manager/accounts/login" />
+                </label>
+                <label class="field">
+                  <span class="field-label">账号</span>
+                  <input class="field-input" id="loginUsernameInput" type="text" placeholder="请输入后台账号" />
+                </label>
+                <label class="field">
+                  <span class="field-label">密码</span>
+                  <input class="field-input" id="loginPasswordInput" type="password" placeholder="请输入后台密码" />
+                </label>
+              </div>
+              <div class="settings-actions">
+                <span class="settings-note">账号密码单独保存到本地运行目录；自动登录后进入新建考试页。</span>
+                <button class="btn" id="saveLoginBtn" type="button">保存登录配置</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="dashboard">
+          <div class="panel">
+            <div class="panel-head">
+              <h2 class="panel-title">导入需求单</h2>
+              <span class="panel-meta" id="fileState">等待导入</span>
+            </div>
+            <div class="panel-body">
+              <label class="drop-zone" id="dropZone" for="fileInput">
+                <span class="file-badge">XLSX</span>
+                <span class="drop-title" id="dropTitle">拖入或选择易考新建考试需求单</span>
+                <span class="drop-note" id="dropNote">支持 .xlsx 文件；导入后会展示关键配置和风险提示。</span>
+                <input class="hidden-input" id="fileInput" type="file" accept=".xlsx,.xls" />
+              </label>
+
+              <div class="summary-grid" aria-label="导入摘要">
+                <div class="metric">
+                  <div class="metric-label">识别配置项</div>
+                  <div class="metric-value" id="metricFields">0</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">需人工确认</div>
+                  <div class="metric-value" id="metricReview">0</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">预计耗时</div>
+                  <div class="metric-value" id="metricTime">0m</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">当前状态</div>
+                  <div class="metric-value" id="metricStatus">待导入</div>
+                </div>
+              </div>
+
+              <div class="mock-window" aria-hidden="true">
+                <div class="mock-window-bar">
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                </div>
+                <div class="mock-body">
+                  <div class="mock-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <div class="mock-content">
+                    <div class="mock-card">
+                      <span class="mock-row short"></span>
+                      <span class="mock-row"></span>
+                      <span class="mock-row mid"></span>
+                    </div>
+                    <div class="mock-card">
+                      <span class="mock-row mid"></span>
+                      <span class="mock-row"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2 class="panel-title">自动配置进度</h2>
+              <span class="panel-meta" id="stageText">尚未开始</span>
+            </div>
+            <div class="panel-body progress-wrap">
+              <div class="progress-top">
+                <div>
+                  <div class="progress-number" id="progressNumber">0%</div>
+                  <p class="subtitle" id="progressCaption">导入需求单后可开始配置</p>
+                </div>
+                <span class="tag amber" id="modeTag">确认页停下</span>
+              </div>
+              <div class="bar" aria-label="配置进度">
+                <div class="bar-fill" id="barFill"></div>
+              </div>
+              <div class="step-list" id="stepList">
+                <div class="step" data-step="0">
+                  <div class="step-index">1</div>
+                  <div class="step-title">读取需求单</div>
+                  <div class="step-state">等待</div>
+                </div>
+                <div class="step" data-step="1">
+                  <div class="step-index">2</div>
+                  <div class="step-title">基础信息</div>
+                  <div class="step-state">等待</div>
+                </div>
+                <div class="step" data-step="2">
+                  <div class="step-index">3</div>
+                  <div class="step-title">个人信息</div>
+                  <div class="step-state">等待</div>
+                </div>
+                <div class="step" data-step="3">
+                  <div class="step-index">4</div>
+                  <div class="step-title">考试配置</div>
+                  <div class="step-state">等待</div>
+                </div>
+                <div class="step" data-step="4">
+                  <div class="step-index">5</div>
+                  <div class="step-title">确认核对</div>
+                  <div class="step-state">等待</div>
+                </div>
+              </div>
+              <div class="review-strip">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 9v4M12 17h.01M10.3 4.6 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                <span>最终创建前会停在易考确认页，重点核对考试时间、试卷绑定、监控项和考生信息字段。</span>
+              </div>
+
+              <div class="capture-panel">
+                <div class="capture-head">
+                  <div class="capture-title">最后确认截图</div>
+                  <span class="tag amber" id="captureState">待截取</span>
+                </div>
+                <div class="capture-grid" id="captureGrid">
+                  <div class="capture-empty">到达确认页后自动截取基本信息完整页，以及考试配置开考前、考试中、考试后三段完整页</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="lower-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h2 class="panel-title">配置预览</h2>
+              <span class="panel-meta">来自需求单填写内容</span>
+            </div>
+            <div class="panel-body">
+              <table>
+                <thead>
+                  <tr>
+                    <th>阶段</th>
+                    <th>配置项</th>
+                    <th>值</th>
+                    <th>处理</th>
+                  </tr>
+                </thead>
+                <tbody id="previewRows">
+                  <tr>
+                    <td>未导入</td>
+                    <td>等待需求单</td>
+                    <td>空</td>
+                    <td><span class="tag amber">待解析</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2 class="panel-title">执行日志</h2>
+              <span class="panel-meta" id="logCount">0 条</span>
+            </div>
+            <div class="panel-body">
+              <div class="log-list" id="logList">
+                <div class="log">
+                  <div>等待导入需求单。</div>
+                  <div class="log-time">系统就绪</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="shotModal" role="dialog" aria-modal="true" aria-labelledby="shotModalTitle">
+      <div class="modal">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title" id="shotModalTitle">确认页截图</div>
+            <p class="subtitle" id="shotModalSubtitle">易考后台配置核对截图</p>
+          </div>
+          <button class="icon-btn" id="closeShotModal" type="button" title="关闭截图预览" aria-label="关闭截图预览">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="large-shot" id="largeShot"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const runtime = {
+        apiBase: window.location.protocol === "file:" ? "http://127.0.0.1:8765" : "",
+        ...(window.EASY_EXAM_RUNTIME || {}),
+      };
+      const fileInput = document.querySelector("#fileInput");
+      const dropZone = document.querySelector("#dropZone");
+      const dropTitle = document.querySelector("#dropTitle");
+      const dropNote = document.querySelector("#dropNote");
+      const fileState = document.querySelector("#fileState");
+      const loginState = document.querySelector("#loginState");
+      const loginUrlInput = document.querySelector("#loginUrlInput");
+      const loginUsernameInput = document.querySelector("#loginUsernameInput");
+      const loginPasswordInput = document.querySelector("#loginPasswordInput");
+      const saveLoginBtn = document.querySelector("#saveLoginBtn");
+      const runBtn = document.querySelector("#runBtn");
+      const demoBtn = document.querySelector("#demoBtn");
+      const resetBtn = document.querySelector("#resetBtn");
+      const previewRows = document.querySelector("#previewRows");
+      const logList = document.querySelector("#logList");
+      const logCount = document.querySelector("#logCount");
+      const barFill = document.querySelector("#barFill");
+      const progressNumber = document.querySelector("#progressNumber");
+      const progressCaption = document.querySelector("#progressCaption");
+      const stageText = document.querySelector("#stageText");
+      const metricFields = document.querySelector("#metricFields");
+      const metricReview = document.querySelector("#metricReview");
+      const metricTime = document.querySelector("#metricTime");
+      const metricStatus = document.querySelector("#metricStatus");
+      const steps = Array.from(document.querySelectorAll(".step"));
+      const captureState = document.querySelector("#captureState");
+      const captureGrid = document.querySelector("#captureGrid");
+      const shotModal = document.querySelector("#shotModal");
+      const shotModalTitle = document.querySelector("#shotModalTitle");
+      const shotModalSubtitle = document.querySelector("#shotModalSubtitle");
+      const closeShotModal = document.querySelector("#closeShotModal");
+      const largeShot = document.querySelector("#largeShot");
+
+      const demoData = {
+        filename: "易考新建考试需求单_美化版.xlsx",
+        metrics: { recognizedFields: 12, needsReview: 4, etaMinutes: 4 },
+        previewRows: [
+          ["基础信息", "考试名称", "易考ai测试考试", "自动填写"],
+          ["基础信息", "考试时间", "2026/06/10 10:00 至 2026/06/10 12:00", "人工核对"],
+          ["基础信息", "提前登录时间", "30 分钟", "自动填写"],
+          ["基础信息", "限制迟到时间", "30 分钟", "自动填写"],
+          ["科目管理", "批量导入科目", "语文、数学", "下载后台模板后导入"],
+          ["个人信息", "考生可见字段", "姓名, 身份证号", "自动勾选"],
+          ["开考前", "考试承诺书", "考生承诺书", "自动填写"],
+          ["考试中", "视频监控/录制", "是 / 是", "自动勾选"],
+          ["考试中", "鹰眼监控", "是", "自动勾选"],
+          ["考试中", "客户端考试", "电脑端；登录限制 5 次", "自动勾选"],
+          ["考试中", "答题水印", "是", "自动勾选"],
+          ["考试中", "禁止复制", "是", "自动勾选"],
+          ["完成", "最终创建", "停在确认页人工检查", "人工确认"],
+        ],
+        warnings: [],
+      };
+
+      const uiState = {
+        uploadId: "",
+        jobId: "",
+        eventSource: null,
+        imported: null,
+        logs: [],
+        captures: [],
+        running: false,
+        login: {
+          url: "https://eztest.org/manager/accounts/login",
+          username: "",
+          password: "",
+        },
+      };
+
+      function nowText() {
+        return new Date().toLocaleTimeString("zh-CN", { hour12: false });
+      }
+
+      function logClass(level = "") {
+        if (level === "success") return "success";
+        if (level === "warn") return "warn";
+        return "";
+      }
+
+      function renderLogs() {
+        if (!uiState.logs.length) {
+          logList.innerHTML = '<div class="log"><div>等待导入需求单。</div><div class="log-time">系统就绪</div></div>';
+          logCount.textContent = "0 条";
+          return;
+        }
+
+        logList.innerHTML = uiState.logs
+          .map(
+            (entry) =>
+              `<div class="log ${logClass(entry.level)}"><div>${entry.message}</div><div class="log-time">${entry.ts || nowText()}</div></div>`,
+          )
+          .join("");
+        logCount.textContent = `${uiState.logs.length} 条`;
+      }
+
+      function addLog(message, level = "") {
+        uiState.logs.unshift({ message, level, ts: nowText() });
+        renderLogs();
+      }
+
+      function applyLoginState(login) {
+        uiState.login = {
+          url: login?.url || "https://eztest.org/manager/accounts/login",
+          username: login?.username || "",
+          password: login?.password || "",
+        };
+        loginUrlInput.value = uiState.login.url;
+        loginUsernameInput.value = uiState.login.username;
+        loginPasswordInput.value = uiState.login.password;
+        const ready = uiState.login.url && uiState.login.username && uiState.login.password;
+        loginState.textContent = ready ? "已保存" : "未配置";
+      }
+
+      function collectLoginState() {
+        return {
+          url: loginUrlInput.value.trim(),
+          username: loginUsernameInput.value.trim(),
+          password: loginPasswordInput.value,
+        };
+      }
+
+      function setProgress(percent, caption, stageIndex) {
+        barFill.style.width = `${percent}%`;
+        progressNumber.textContent = `${percent}%`;
+        progressCaption.textContent = caption;
+        steps.forEach((step, index) => {
+          step.classList.toggle("done", stageIndex >= 0 && index < stageIndex);
+          step.classList.toggle("active", index === stageIndex);
+          step.querySelector(".step-state").textContent =
+            stageIndex < 0 ? "等待" : index < stageIndex ? "完成" : index === stageIndex ? "进行中" : "等待";
+        });
+      }
+
+      function renderPreview(rows) {
+        if (!rows?.length) {
+          previewRows.innerHTML =
+            '<tr><td>未导入</td><td>等待需求单</td><td>空</td><td><span class="tag amber">待解析</span></td></tr>';
+          return;
+        }
+
+        previewRows.innerHTML = rows
+          .map(([stage, item, value, action]) => {
+            const tagClass = action.includes("人工") ? "amber" : action.includes("自动") ? "green" : "";
+            return `<tr><td>${stage}</td><td>${item}</td><td>${value}</td><td><span class="tag ${tagClass}">${action}</span></td></tr>`;
+          })
+          .join("");
+      }
+
+      function renderCaptures(captures) {
+        uiState.captures = captures || [];
+        if (!uiState.captures.length) {
+          captureState.textContent = "待截取";
+          captureState.className = "tag amber";
+          captureGrid.innerHTML =
+            '<div class="capture-empty">到达确认页后自动截取基本信息完整页，以及考试配置开考前、考试中、考试后三段完整页</div>';
+          return;
+        }
+
+        captureState.textContent = "已截取";
+        captureState.className = "tag green";
+        captureGrid.innerHTML = uiState.captures
+          .map(
+            (capture, index) => `
+              <button class="capture-card" type="button" data-shot="${index}" aria-label="查看${capture.title}">
+                <div class="capture-thumb" style="display:block;padding:0;height:118px;overflow:hidden;background:#e9edf3;">
+                  <img src="${capture.url}" alt="${capture.title}" style="width:100%;display:block;" />
+                </div>
+                <div class="capture-info">
+                  <strong>${capture.title}</strong>
+                  <span>点击查看完整截图</span>
+                </div>
+              </button>
+            `,
+          )
+          .join("");
+      }
+
+      function eqHeader(activeStep) {
+        const steps = ["基本信息", "选择试卷", "个人信息", "考试配置", "完成"];
+        return `
+          <div class="eq-topnav">
+            <div class="eq-logo"><span class="eq-logo-mark">易</span><span>易考</span></div>
+            <div class="eq-menu"><span>控制台</span><span>试卷</span><span>考试</span><span>报名</span><span>题库</span><span>组卷</span><span>阅卷</span></div>
+            <div>陈军</div>
+          </div>
+          <div class="eq-stepbar">
+            ${steps
+              .map((label, index) => {
+                const state = index + 1 < activeStep ? "done" : index + 1 === activeStep ? "active" : "";
+                return `<span class="eq-step ${state}"><span class="eq-step-num">${index + 1}</span>${label}</span>`;
+              })
+              .join("")}
+          </div>
+        `;
+      }
+
+      function largeShotTemplate(type) {
+        if (type === "0") {
+          return `
+            <div class="eq-shot">
+              ${eqHeader(1)}
+              <div class="eq-page">
+                <div class="eq-field">
+                  <div class="eq-label">考试名称</div>
+                  <div class="eq-input">测试考试</div>
+                </div>
+                <div class="eq-field">
+                  <div class="eq-label">考试时间</div>
+                  <div class="eq-inline">
+                    <span class="eq-input">2026/06/01 10:00</span>
+                    <strong>→</strong>
+                    <span class="eq-input">2026/06/01 12:00</span>
+                    <span>(UTC+08:00)</span>
+                  </div>
+                </div>
+                <div class="eq-inline"><span class="eq-check on"></span>提前登录：开考前 <span class="eq-small-input">30</span> 分钟</div>
+                <div class="eq-inline"><span class="eq-check on"></span>限制迟到：开考后 <span class="eq-small-input">30</span> 分钟</div>
+                <div class="eq-inline"><span class="eq-check"></span>交卷限制：不启用</div>
+                <div class="eq-field">
+                  <div class="eq-label">试卷扣时规则</div>
+                  <div class="eq-inline"><span><span class="eq-radio"></span>不扣时</span><span><span class="eq-radio"></span>迟到扣时</span><span><span class="eq-radio on"></span>迟到及离开扣时</span></div>
+                </div>
+                <div class="eq-field">
+                  <div class="eq-label">场次类型</div>
+                  <div class="eq-inline"><span><span class="eq-radio on"></span>考试</span><span><span class="eq-radio"></span>面试</span><span><span class="eq-radio"></span>测评</span><span><span class="eq-radio"></span>自定义</span></div>
+                </div>
+                <div class="eq-field">
+                  <div class="eq-label">考试地址</div>
+                  <div class="eq-inline"><span><span class="eq-radio on"></span>独立考试地址</span><span><span class="eq-radio"></span>统一考试地址</span></div>
+                </div>
+                <div class="eq-field">
+                  <div class="eq-label">交卷后跳转</div>
+                  <div class="eq-inline"><span><span class="eq-radio on"></span>不跳转</span><span><span class="eq-radio"></span>退出并返回登录首页</span><span><span class="eq-radio"></span>自定义地址</span></div>
+                </div>
+                <div class="eq-field">
+                  <div class="eq-label">欢迎语</div>
+                  <div class="eq-textarea">测试考试</div>
+                </div>
+                <div class="eq-field">
+                  <div class="eq-label">默认语言</div>
+                  <div class="eq-select">简体中文</div>
+                </div>
+                <div class="eq-field">
+                  <div class="eq-label">可见性</div>
+                  <div class="eq-inline"><span><span class="eq-radio on"></span>公开</span><span><span class="eq-radio"></span>私有</span></div>
+                </div>
+              </div>
+              <div class="eq-actions"><button class="eq-next" type="button">下一步</button></div>
+            </div>
+          `;
+        }
+
+        if (type === "1") {
+          return `
+            <div class="eq-shot">
+              ${eqHeader(4)}
+              <div class="eq-page">
+                <div class="eq-section-title">开考前</div>
+                <div class="eq-config-section">
+                  <div class="eq-option">
+                    <div><span class="eq-check"></span>即报即考</div>
+                    <div class="eq-option-desc">未开启。只有取得准考证的考生才可参加考试。</div>
+                  </div>
+                  <div class="eq-option">
+                    <div><span class="eq-check"></span>限定登录位置</div>
+                    <div class="eq-option-desc">未开启。当前不按 IP 地址限制考生登录位置。</div>
+                  </div>
+                  <div class="eq-option">
+                    <div><span class="eq-check"></span>练习模式</div>
+                    <div class="eq-option-desc">未开启。考生作答后不可立即查看答案和解析。</div>
+                  </div>
+                  <div class="eq-option">
+                    <div><span class="eq-check on"></span>考试承诺书</div>
+                    <div class="eq-option-desc">考生登录后需同意以下内容方可进入考试。<div class="eq-textarea">测试考试</div></div>
+                  </div>
+                  <div class="eq-option">
+                    <div><span class="eq-check"></span>资料审核</div>
+                    <div class="eq-option-desc">未开启。证件照、环境照审核均保持关闭。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        if (type === "2") {
+          return `
+          <div class="eq-shot">
+            ${eqHeader(4)}
+            <div class="eq-page">
+              <div class="eq-section-title">考试中</div>
+              <div class="eq-config-section">
+                <div class="eq-option">
+                  <div><span class="eq-check on"></span>视频监控</div>
+                  <div class="eq-option-desc">实时监控考生考试视频，并随机抓拍考生照片。<span class="eq-pill">视频录制：开启</span></div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>登录验证 / 作弊侦测 / 视线追踪</div>
+                  <div class="eq-option-desc">保持关闭。仅开启视频监控与视频录制。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check on"></span>鹰眼监控</div>
+                  <div class="eq-option-desc">使用考生手机监控考试环境。主鹰眼监考要求已保留系统默认说明。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>桌面监控</div>
+                  <div class="eq-option-desc">未开启。桌面视频录制保持关闭。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check on"></span>锁定考试</div>
+                  <div class="eq-option-desc">记录考生登录考试次数，只允许登录 <span class="eq-small-input">5</span> 次；客户端考试：电脑端（Windows版/Mac版）。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check on"></span>独占网络</div>
+                  <div class="eq-option-desc">考试时自动关闭除客户端外其他所有需要使用网络的软件。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check on"></span>答题水印</div>
+                  <div class="eq-option-desc">作答页面使用场次唯一编号和考生准考证号作为背景水印。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check on"></span>禁止复制</div>
+                  <div class="eq-option-desc">禁止考生对试卷内容进行复制。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>显示分值</div>
+                  <div class="eq-option-desc">未开启。试题分值不向考生可见。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        }
+
+        return `
+          <div class="eq-shot">
+            ${eqHeader(4)}
+            <div class="eq-page">
+              <div class="eq-section-title">考试后</div>
+              <div class="eq-config-section">
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>查看成绩</div>
+                  <div class="eq-option-desc">未开启。考生完成考试后不可自行查看考试结果。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>查看试卷解析</div>
+                  <div class="eq-option-desc">未开启。该项需开启查看成绩后才可配置。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>强收禁查</div>
+                  <div class="eq-option-desc">未开启。人工强制收卷后的成绩查看限制保持默认。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>不满意重做</div>
+                  <div class="eq-option-desc">未开启。保留最高分、保留答案、错题练习、强收禁止重做均保持关闭。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>分数线</div>
+                  <div class="eq-option-desc">未开启。通过分数未设置。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>人工判分</div>
+                  <div class="eq-option-desc">未开启。主观题人工判分保持默认关闭。</div>
+                </div>
+                <div class="eq-option">
+                  <div><span class="eq-check"></span>成绩通知</div>
+                  <div class="eq-option-desc">未开启。未配置成绩通知邮箱。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function openShot(index) {
+        const capture = uiState.captures[index];
+        if (capture?.url) {
+          shotModalTitle.textContent = capture.title;
+          shotModalSubtitle.textContent = "易考后台确认截图";
+          largeShot.innerHTML = `
+            <div style="background:#eef2f7;padding:14px;display:grid;place-items:center;min-height:480px;">
+              <img src="${capture.url}" alt="${capture.title}" style="max-width:100%;height:auto;display:block;border:1px solid #d0d8e4;border-radius:6px;background:#fff;" />
+            </div>
+          `;
+        } else {
+          const type = String(index);
+          const shotTitles = {
+            0: ["基本信息完整页", "考试名称、时间、迟到限制、欢迎语"],
+            1: ["考试配置-开考前", "承诺书、资料审核、练习模式"],
+            2: ["考试配置-考试中", "视频监控、鹰眼、客户端、水印、禁止复制"],
+            3: ["考试配置-考试后", "成绩查看、重做、分数线、人工判分"],
+          };
+          const [title, subtitle] = shotTitles[type] ?? shotTitles[0];
+          shotModalTitle.textContent = title;
+          shotModalSubtitle.textContent = subtitle;
+          largeShot.innerHTML = largeShotTemplate(type);
+        }
+        shotModal.classList.add("open");
+        closeShotModal.focus();
+      }
+
+      function closeShot() {
+        shotModal.classList.remove("open");
+      }
+
+      function applyImportResult(fileName, data) {
+        dropZone.classList.add("is-ready");
+        dropTitle.textContent = fileName;
+        dropNote.textContent = "需求单已导入，已生成配置预览。可点击开始配置进入自动执行。";
+        fileState.textContent = "已导入";
+        metricFields.textContent = String(data.metrics?.recognizedFields || 0);
+        metricReview.textContent = String(data.metrics?.needsReview || 0);
+        metricTime.textContent = `${data.metrics?.etaMinutes || 0}m`;
+        metricStatus.textContent = "已校验";
+        runBtn.disabled = false;
+        renderPreview(data.previewRows);
+        addLog(`已导入需求单：${fileName}`, "success");
+        if (data.config) {
+          addLog(`识别到考试名称：${data.config.examName || "空"}`, "success");
+          addLog(
+            `识别到考试时间：${data.config.startTimeDisplay || "空"} - ${data.config.endTimeDisplay || "空"}`,
+            "success",
+          );
+        }
+        addLog("考试时间将走日期时间控件；提前登录和迟到时间将直接输入数字。", "success");
+        addLog("科目会先下载易考后台科目导入模板，填充后直接上传。", "success");
+        if (data.warnings?.length) {
+          data.warnings.forEach((warning) => addLog(warning, "warn"));
+        }
+      }
+
+      async function importWorkbook(file) {
+        if (!file) return;
+        const buffer = await file.arrayBuffer();
+        const response = await fetch(`${runtime.apiBase}/api/import?filename=${encodeURIComponent(file.name)}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/octet-stream",
+          },
+          body: buffer,
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "导入失败");
+        }
+        uiState.uploadId = data.uploadId;
+        uiState.imported = data;
+        applyImportResult(file.name, data);
+      }
+
+      async function loadSettings() {
+        const response = await fetch(`${runtime.apiBase}/api/settings`);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "读取设置失败");
+        }
+        applyLoginState(data.login || {});
+      }
+
+      async function saveLoginSettings() {
+        const login = collectLoginState();
+        if (!login.url || !login.username || !login.password) {
+          throw new Error("请完整填写登录网址、账号和密码。");
+        }
+        const response = await fetch(`${runtime.apiBase}/api/settings`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ login }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "保存登录配置失败");
+        }
+        applyLoginState(data.settings?.login || login);
+        addLog("后台登录配置已保存，后续任务会自动登录易考后台。", "success");
+      }
+
+      fileInput.addEventListener("change", async (event) => {
+        try {
+          await importWorkbook(event.target.files[0]);
+        } catch (error) {
+          addLog(error.message || String(error), "warn");
+        }
+      });
+
+      demoBtn.addEventListener("click", () => {
+        uiState.uploadId = "demo";
+        uiState.imported = demoData;
+        applyImportResult(demoData.filename, demoData);
+      });
+
+      saveLoginBtn.addEventListener("click", async () => {
+        try {
+          await saveLoginSettings();
+        } catch (error) {
+          addLog(error.message || String(error), "warn");
+        }
+      });
+
+      captureGrid.addEventListener("click", (event) => {
+        const card = event.target.closest("[data-shot]");
+        if (card) openShot(Number(card.dataset.shot));
+      });
+
+      closeShotModal.addEventListener("click", closeShot);
+      shotModal.addEventListener("click", (event) => {
+        if (event.target === shotModal) closeShot();
+      });
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && shotModal.classList.contains("open")) closeShot();
+      });
+
+      dropZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        dropZone.classList.add("is-ready");
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        if (!fileInput.files.length) dropZone.classList.remove("is-ready");
+      });
+
+      dropZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        importWorkbook(event.dataTransfer.files[0]).catch((error) => addLog(error.message || String(error), "warn"));
+      });
+
+      function connectEvents(jobId) {
+        if (uiState.eventSource) {
+          uiState.eventSource.close();
+        }
+        uiState.eventSource = new EventSource(`${runtime.apiBase}/api/jobs/${jobId}/events`);
+        uiState.eventSource.onmessage = (event) => {
+          const payload = JSON.parse(event.data);
+          if (payload.type === "log") {
+            addLog(payload.message, payload.level || "");
+          }
+          if (payload.type === "stage") {
+            stageText.textContent = payload.stage;
+            setProgress(payload.percent || 0, payload.caption || "", payload.stepIndex ?? -1);
+          }
+          if (payload.type === "status") {
+            metricStatus.textContent =
+              payload.status === "action_required"
+                ? "等待登录"
+                : payload.status === "waiting_confirmation"
+                  ? "待确认"
+                  : payload.status === "done"
+                    ? "已完成"
+                    : "执行中";
+            if (payload.message) {
+              progressCaption.textContent = payload.message;
+            }
+          }
+          if (payload.type === "captures") {
+            renderCaptures(payload.captures);
+          }
+          if (payload.type === "done") {
+            metricStatus.textContent = "待确认";
+            uiState.running = false;
+            runBtn.disabled = false;
+          }
+          if (payload.type === "error") {
+            addLog(payload.message, "warn");
+            metricStatus.textContent = "执行失败";
+            uiState.running = false;
+            runBtn.disabled = false;
+          }
+        };
+      }
+
+      runBtn.addEventListener("click", async () => {
+        if (uiState.running || !uiState.uploadId || uiState.uploadId === "demo") return;
+        try {
+          const login = collectLoginState();
+          if (!login.url || !login.username || !login.password) {
+            throw new Error("开始配置前，请先保存后台登录配置。");
+          }
+          const config = uiState.imported?.config || {};
+          if (!config.examName || !config.startTimeDisplay || !config.endTimeDisplay) {
+            throw new Error("当前导入结果缺少考试名称或考试时间，请重新上传最新需求单。");
+          }
+          uiState.running = true;
+          runBtn.disabled = true;
+          metricStatus.textContent = "执行中";
+          addLog("开始自动配置易考后台。", "success");
+          addLog(`本次执行使用需求单：${uiState.imported?.filename || "未命名文件"}`, "success");
+          addLog(`本次执行考试名称：${config.examName}`, "success");
+          addLog(`本次执行考试时间：${config.startTimeDisplay} - ${config.endTimeDisplay}`, "success");
+          addLog(`本次执行提前登录/限制迟到：${config.earlyLoginMinutes ?? "空"} / ${config.lateLimitMinutes ?? "空"} 分钟`, "success");
+
+          const response = await fetch(`${runtime.apiBase}/api/jobs`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ uploadId: uiState.uploadId, login }),
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "创建任务失败");
+          }
+          uiState.jobId = data.jobId;
+          connectEvents(data.jobId);
+        } catch (error) {
+          addLog(error.message || String(error), "warn");
+          metricStatus.textContent = "执行失败";
+          uiState.running = false;
+          runBtn.disabled = false;
+        }
+      });
+
+      resetBtn.addEventListener("click", () => {
+        if (uiState.eventSource) {
+          uiState.eventSource.close();
+          uiState.eventSource = null;
+        }
+        uiState.uploadId = "";
+        uiState.jobId = "";
+        uiState.imported = null;
+        uiState.logs = [];
+        uiState.captures = [];
+        uiState.running = false;
+        fileInput.value = "";
+        dropZone.classList.remove("is-ready");
+        dropTitle.textContent = "拖入或选择易考新建考试需求单";
+        dropNote.textContent = "支持 .xlsx 文件；导入后会展示关键配置和风险提示。";
+        fileState.textContent = "等待导入";
+        metricFields.textContent = "0";
+        metricReview.textContent = "0";
+        metricTime.textContent = "0m";
+        metricStatus.textContent = "待导入";
+        renderCaptures([]);
+        renderPreview([]);
+        renderLogs();
+        runBtn.disabled = true;
+        stageText.textContent = "尚未开始";
+        setProgress(0, "导入需求单后可开始配置", -1);
+      });
+
+      renderLogs();
+      loadSettings().catch((error) => addLog(error.message || String(error), "warn"));
+    </script>
+  </body>
+</html>

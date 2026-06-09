@@ -1,0 +1,64 @@
+# 易考新建考试脚本输入模板
+# 时间默认使用易考后台系统时区 UTC+08:00。
+
+request_id: CGFT-EXAM-YYYYMM-001
+requester:
+request_date: "2026-05-29"
+environment: 生产
+allow_submit: false
+
+basic_info:
+  exam_name:
+  start_time: "YYYY-MM-DD HH:mm"
+  end_time: "YYYY-MM-DD HH:mm"
+  enable_early_login: true
+  early_login_minutes: 30
+  enable_late_limit: true
+  late_limit_minutes: 30
+  enable_submit_limit: false
+  submit_limit_start_minutes:
+  submit_limit_end_minutes:
+  time_deduction_rule: 不扣时
+  session_type: 考试
+  custom_session_type:
+  exam_url_type: 独立考试地址
+  after_submit_redirect: 不跳转
+  redirect_url:
+  welcome_message:
+  default_language: 简体中文
+  visibility: 公开
+
+paper:
+  paper_name:
+  paper_id:
+  paper_not_found_action: 停止并报错
+
+profile:
+  profile_template_name: CGFT默认个人信息
+  collect_name: true
+  collect_phone: 按模板
+  collect_id_number: 按模板
+  collect_email: 按模板
+  extra_profile_fields: []
+
+exam_config:
+  enable_camera_photo: 按模板
+  enable_face_verify: 按模板
+  enable_switch_screen_limit: 按模板
+  switch_screen_limit_count:
+  enable_fullscreen: 按模板
+  allow_review: 按模板
+  allow_change_answer: 按模板
+  randomize_questions: 按模板
+  randomize_options: 按模板
+  show_score_after_submit: false
+  show_answer_after_submit: false
+  invigilation_mode: 按模板
+  config_notes:
+
+candidates:
+  candidate_source: 报名项目
+  enrollment_name:
+  enrollment_id:
+  candidate_file:
+  expected_candidate_count:

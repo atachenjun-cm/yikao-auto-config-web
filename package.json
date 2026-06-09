@@ -1,0 +1,12 @@
+{
+  "name": "yikao-auto-config-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server/easy_exam_server.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.54.2"
+  }
+}
